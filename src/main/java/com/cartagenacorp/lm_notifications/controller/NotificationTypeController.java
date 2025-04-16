@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notification-types")
-@CrossOrigin("*")
 public class NotificationTypeController {
 
     private final NotificationTypeService notificationTypeService;
