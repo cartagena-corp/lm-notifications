@@ -36,7 +36,7 @@ public class NotificationService {
         this.notificationTypeRepository = notificationTypeRepository;
     }
 
-    public Notification createNotification(UUID userId, String message, String typeName, JsonNode metadata) {
+    public Notification createNotification(UUID userId, String message, String typeName, JsonNode metadata, UUID projectId, UUID issueId) {
         NotificationType type = notificationTypeRepository.findById(typeName)
                 .orElseThrow(() -> new IllegalArgumentException("Type of notification not valid: " + typeName));
 
@@ -53,7 +53,7 @@ public class NotificationService {
             throw new IllegalArgumentException("Invalid JSON format for metadata", e);
         }
 
-        Notification notification = new Notification(null, userId, message, type, false, LocalDateTime.now(), metadataString);
+        Notification notification = new Notification(null, userId, message, type, false, LocalDateTime.now(), metadataString, projectId, issueId);
         Notification saved = notificationRepository.save(notification);
 
         long unreadCount = notificationRepository.countByUserIdAndReadFalse(userId);

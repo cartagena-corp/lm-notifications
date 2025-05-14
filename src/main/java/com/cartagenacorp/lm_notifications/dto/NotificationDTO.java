@@ -18,4 +18,6 @@ public class NotificationDTO {
     private boolean read;
     private LocalDateTime timestamp;
     private JsonNode metadata;
+    private UUID projectId;
+    private UUID issueId;
 }

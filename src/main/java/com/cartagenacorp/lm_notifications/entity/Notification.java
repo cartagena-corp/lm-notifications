@@ -29,4 +29,7 @@ public class Notification {
     private LocalDateTime timestamp;
 
     private String metadata;
+
+    private UUID projectId;
+    private UUID issueId;
 }

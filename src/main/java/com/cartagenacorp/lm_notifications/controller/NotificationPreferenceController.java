@@ -5,8 +5,6 @@ import com.cartagenacorp.lm_notifications.entity.NotificationPreference;
 import com.cartagenacorp.lm_notifications.service.NotificationPreferenceService;
 import com.cartagenacorp.lm_notifications.util.RequiresPermission;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,16 +30,8 @@ public class NotificationPreferenceController {
     @PutMapping
     @RequiresPermission({"NOTIFICATION_CRUD"})
     public ResponseEntity<?> updateAll(@RequestBody List<NotificationPreferenceDTO> preferences) {
-        try {
-            service.updatePreferences(preferences);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } catch (DataIntegrityViolationException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Assigned user not found");
-        } catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        service.updatePreferences(preferences);
+        return ResponseEntity.noContent().build();
     }
 
 }

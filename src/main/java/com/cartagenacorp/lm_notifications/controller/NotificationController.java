@@ -6,10 +6,7 @@ import com.cartagenacorp.lm_notifications.entity.Notification;
 import com.cartagenacorp.lm_notifications.mapper.NotificationMapper;
 import com.cartagenacorp.lm_notifications.service.NotificationService;
 import com.cartagenacorp.lm_notifications.util.RequiresPermission;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,20 +29,18 @@ public class NotificationController {
 
     @PostMapping("/send")
     public ResponseEntity<?> send(@RequestBody NotificationRequestDTO request) {
-        try {
-            Notification notification = service.createNotification(request.getUserId(), request.getMessage(), request.getType(), request.getMetadata());
-            if (notification == null) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(notificationMapper.toDTO(notification));
-
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        } catch (DataIntegrityViolationException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Assigned user not found");
-        } catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        Notification notification = service.createNotification(
+                request.getUserId(),
+                request.getMessage(),
+                request.getType(),
+                request.getMetadata(),
+                request.getProjectId(),
+                request.getIssueId()
+        );
+        if (notification == null) {
+            return ResponseEntity.noContent().build();
         }
+        return ResponseEntity.ok(notificationMapper.toDTO(notification));
     }
 
     @GetMapping
@@ -59,44 +54,28 @@ public class NotificationController {
     @PutMapping("/{id}/read")
     @RequiresPermission({"NOTIFICATION_CRUD"})
     public ResponseEntity<?> markRead(@PathVariable UUID id) {
-        try {
-            service.markAsRead(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        service.markAsRead(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/read-all")
     @RequiresPermission({"NOTIFICATION_CRUD"})
     public ResponseEntity<?> markAllRead() {
-        try {
-            service.markAllAsRead();
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        service.markAllAsRead();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     @RequiresPermission({"NOTIFICATION_CRUD"})
     public ResponseEntity<?> delete(@PathVariable UUID id) {
-        try {
-            service.deleteNotification(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        service.deleteNotification(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete-all")
     @RequiresPermission({"NOTIFICATION_CRUD"})
     public ResponseEntity<?> deleteAll() {
-        try {
-            service.deleteAllNotifications();
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        service.deleteAllNotifications();
+        return ResponseEntity.noContent().build();
     }
 }

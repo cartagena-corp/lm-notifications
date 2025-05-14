@@ -15,4 +15,6 @@ public class NotificationRequestDTO {
     private String message;
     private String type;
     private JsonNode metadata;
+    private UUID projectId;
+    private UUID issueId;
 }

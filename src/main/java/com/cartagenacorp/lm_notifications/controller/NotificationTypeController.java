@@ -3,8 +3,6 @@ package com.cartagenacorp.lm_notifications.controller;
 import com.cartagenacorp.lm_notifications.entity.NotificationType;
 import com.cartagenacorp.lm_notifications.service.NotificationTypeService;
 import com.cartagenacorp.lm_notifications.util.RequiresPermission;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,14 +33,7 @@ public class NotificationTypeController {
     @DeleteMapping("/{name}")
     @RequiresPermission({"NOTIFICATION_TYPE_CRUD"})
     public ResponseEntity<?> delete(@PathVariable String name) {
-        try {
-            notificationTypeService.delete(name);
-            return ResponseEntity.noContent().build();
-        } catch (DataIntegrityViolationException ex){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("You cannot delete the notification type because it is used in preference");
-        } catch (Exception ex){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-
+        notificationTypeService.delete(name);
+        return ResponseEntity.noContent().build();
     }
 }

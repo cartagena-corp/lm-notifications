@@ -35,7 +35,9 @@ public class NotificationMapper {
                 notification.getType().getName(),
                 notification.isRead(),
                 notification.getTimestamp(),
-                metadataNode
+                metadataNode,
+                notification.getProjectId(),
+                notification.getIssueId()
         );
     }
 }
