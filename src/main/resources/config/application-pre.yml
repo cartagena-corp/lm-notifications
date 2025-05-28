@@ -11,7 +11,7 @@ spring:
     open-in-view: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 server:
-  port: '8086'
+  port: 8086
 app:
   cors:
     allowed-origins: https://cartagenacorporation.com,https://www.cartagenacorporation.com
