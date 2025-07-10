@@ -1,7 +1,9 @@
 package com.cartagenacorp.lm_notifications.service;
 
+import com.cartagenacorp.lm_notifications.dto.NotificationDTO;
 import com.cartagenacorp.lm_notifications.entity.Notification;
 import com.cartagenacorp.lm_notifications.entity.NotificationType;
+import com.cartagenacorp.lm_notifications.mapper.NotificationMapper;
 import com.cartagenacorp.lm_notifications.repository.NotificationRepository;
 import com.cartagenacorp.lm_notifications.repository.NotificationTypeRepository;
 import com.cartagenacorp.lm_notifications.util.JwtContextHolder;
@@ -24,16 +26,18 @@ public class NotificationService {
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationPreferenceService notificationPreferenceService;
     private final NotificationTypeRepository notificationTypeRepository;
+    private final NotificationMapper notificationMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public NotificationService(NotificationRepository notificationRepository, SimpMessagingTemplate messagingTemplate,
                                NotificationPreferenceService notificationPreferenceService,
-                               NotificationTypeRepository notificationTypeRepository) {
+                               NotificationTypeRepository notificationTypeRepository, NotificationMapper notificationMapper) {
         this.notificationRepository = notificationRepository;
         this.messagingTemplate = messagingTemplate;
         this.notificationPreferenceService = notificationPreferenceService;
         this.notificationTypeRepository = notificationTypeRepository;
+        this.notificationMapper = notificationMapper;
     }
 
     public Notification createNotification(UUID userId, String message, String typeName, JsonNode metadata, UUID projectId, UUID issueId) {
@@ -56,11 +60,11 @@ public class NotificationService {
         Notification notification = new Notification(null, userId, message, type, false, LocalDateTime.now(), metadataString, projectId, issueId);
         Notification saved = notificationRepository.save(notification);
 
+        NotificationDTO dto = notificationMapper.toDTO(saved);
         long unreadCount = notificationRepository.countByUserIdAndReadFalse(userId);
         Map<String, Object> payload = new HashMap<>();
-        payload.put("message", message);
         payload.put("unreadCount", unreadCount);
-        payload.put("metadata", metadata);
+        payload.put("notification", dto);
 
         messagingTemplate.convertAndSend("/topic/notifications/" + userId, payload);
         return saved;
